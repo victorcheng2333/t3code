@@ -2,10 +2,12 @@ import type { ReactNode } from "react";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import {
   DEFAULT_UNIFIED_SETTINGS,
+  MAX_CHAT_FONT_SIZE,
   MAX_CODE_FONT_SIZE,
   MAX_INTERFACE_FONT_SIZE,
   MAX_PROMPT_FONT_SIZE,
   MAX_TERMINAL_FONT_SIZE,
+  MIN_CHAT_FONT_SIZE,
   MIN_CODE_FONT_SIZE,
   MIN_INTERFACE_FONT_SIZE,
   MIN_PROMPT_FONT_SIZE,
@@ -83,6 +85,60 @@ function InterfaceFontRow({ preview }: { preview?: ReactNode }) {
         onChange: (fontSizeInterface) => updateSettings({ fontSizeInterface }),
       }}
       {...(preview !== undefined ? { preview } : {})}
+    />
+  );
+}
+
+const FOLLOW_INTERFACE = "interface";
+
+function ChatFontSizeRow() {
+  const settings = useScopedSettings();
+  const updateSettings = useUpdateScopedSettings();
+  const size = settings.fontSizeChat;
+  return (
+    <SettingsRow
+      {...searchableSetting("chat-font")}
+      description="Message text in conversations. Follows the interface size by default."
+      resetAction={
+        size !== DEFAULT_UNIFIED_SETTINGS.fontSizeChat ? (
+          <SettingResetButton
+            label="chat text size"
+            onClick={() => updateSettings({ fontSizeChat: DEFAULT_UNIFIED_SETTINGS.fontSizeChat })}
+          />
+        ) : null
+      }
+      control={
+        <Select
+          value={size === null ? FOLLOW_INTERFACE : String(size)}
+          onValueChange={(next) => {
+            if (next === FOLLOW_INTERFACE) {
+              updateSettings({ fontSizeChat: null });
+              return;
+            }
+            const parsed = Number(next);
+            if (parsed >= MIN_CHAT_FONT_SIZE && parsed <= MAX_CHAT_FONT_SIZE) {
+              updateSettings({ fontSizeChat: parsed });
+            }
+          }}
+        >
+          <SelectTrigger size="sm" className="w-40 shrink-0" aria-label="Chat text size">
+            <SelectValue>{size === null ? "Match interface" : `${size} px`}</SelectValue>
+          </SelectTrigger>
+          <SelectPopup align="end" alignItemWithTrigger={false}>
+            <SelectItem hideIndicator value={FOLLOW_INTERFACE}>
+              Match interface
+            </SelectItem>
+            {Array.from(
+              { length: MAX_CHAT_FONT_SIZE - MIN_CHAT_FONT_SIZE + 1 },
+              (_, index) => MIN_CHAT_FONT_SIZE + index,
+            ).map((px) => (
+              <SelectItem hideIndicator key={px} value={String(px)}>
+                {px} px
+              </SelectItem>
+            ))}
+          </SelectPopup>
+        </Select>
+      }
     />
   );
 }
@@ -259,6 +315,7 @@ function FontSettingsGroup() {
   return (
     <>
       <InterfaceFontRow />
+      <ChatFontSizeRow />
       <PromptFontRow />
       <CodeFontRow />
       <TerminalFontRow />
@@ -293,6 +350,7 @@ function SimpleFontRows() {
   return (
     <>
       <InterfaceFontRow preview={<PromptFontPreview />} />
+      <ChatFontSizeRow />
       <CodeFontRow
         title="Monospace font"
         description="Code blocks, diffs, file previews, and the terminal."

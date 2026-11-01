@@ -1924,6 +1924,27 @@ code {
   color: var(--contrast-muted-foreground);
 }
 
+/* Chat text size follows --font-size-chat; headings and notes keep their ratio to it. */
+.chat-markdown {
+  --chat-text-size: var(--font-size-chat, var(--text-sm));
+}
+
+.chat-markdown h1 {
+  font-size: calc(var(--chat-text-size) * 20 / 14);
+}
+
+.chat-markdown h2 {
+  font-size: calc(var(--chat-text-size) * 18 / 14);
+}
+
+.chat-markdown h3 {
+  font-size: calc(var(--chat-text-size) * 16 / 14);
+}
+
+.chat-markdown :is(h4, h5, h6) {
+  font-size: var(--chat-text-size);
+}
+
 :is(.chat-markdown, .composer-tiptap) ul {
   /* Reset for nested uls under a widened ol. --list-gutter is an inherited
      custom property, so without this a task-list under a multi-digit ordered
@@ -2102,7 +2123,7 @@ code {
   border-top: 1px solid var(--contrast-border);
   padding-top: 0.75rem;
   color: var(--contrast-muted-foreground);
-  font-size: 0.75rem;
+  font-size: calc(var(--chat-text-size) * 12 / 14);
 }
 
 .chat-markdown section[data-footnotes] ol {
@@ -2121,7 +2142,7 @@ code {
   justify-content: center;
   border-radius: 0.25rem;
   text-decoration: none;
-  font-size: 0.6875rem;
+  font-size: calc(var(--chat-text-size) * 11 / 14);
   font-weight: 600;
 }
 
@@ -2227,8 +2248,7 @@ code {
   border-collapse: collapse;
   overflow-wrap: normal;
   word-break: normal;
-  /* One step under 15px prose. */
-  font-size: 0.875rem;
+  font-size: var(--chat-text-size);
 }
 
 /* Top-aligned so wrapped rows share a first line, and the outer columns sit

@@ -2,9 +2,11 @@ import {
   DEFAULT_CODE_FONT_SIZE,
   DEFAULT_INTERFACE_FONT_SIZE,
   DEFAULT_PROMPT_FONT_SIZE,
+  MAX_CHAT_FONT_SIZE,
   MAX_CODE_FONT_SIZE,
   MAX_INTERFACE_FONT_SIZE,
   MAX_PROMPT_FONT_SIZE,
+  MIN_CHAT_FONT_SIZE,
   MIN_CODE_FONT_SIZE,
   MIN_INTERFACE_FONT_SIZE,
   MIN_PROMPT_FONT_SIZE,
@@ -64,6 +66,7 @@ export interface AppearanceFontPreferences {
   readonly composer: string;
   readonly sizeInterface: number;
   readonly sizePrompt: number;
+  readonly sizeChat: number | null;
   readonly sizeCode: number;
   readonly smoothing: boolean;
   readonly separate: boolean;
@@ -93,6 +96,11 @@ export function applyAppearanceFontVariables(
     "--font-size-prompt",
     preferences.separate ? `${clampPromptFontSize(preferences.sizePrompt)}px` : "var(--text-sm)",
   );
+  if (preferences.sizeChat === null) {
+    root.style.removeProperty("--font-size-chat");
+  } else {
+    root.style.setProperty("--font-size-chat", `${clampChatFontSize(preferences.sizeChat)}px`);
+  }
   const code = clampCodeFontSize(preferences.sizeCode);
   root.style.setProperty("--font-size-code", `${code}px`);
   root.style.setProperty("--diffs-font-size", `${code}px`);
@@ -120,6 +128,10 @@ function clampInterfaceFontSize(value: number): number {
 
 function clampPromptFontSize(value: number): number {
   return clampFontSize(value, MIN_PROMPT_FONT_SIZE, MAX_PROMPT_FONT_SIZE, DEFAULT_PROMPT_FONT_SIZE);
+}
+
+function clampChatFontSize(value: number): number {
+  return clampFontSize(value, MIN_CHAT_FONT_SIZE, MAX_CHAT_FONT_SIZE, MIN_CHAT_FONT_SIZE);
 }
 
 function clampCodeFontSize(value: number): number {

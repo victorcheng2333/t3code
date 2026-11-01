@@ -25,6 +25,12 @@ const touchComposerFontSize = () =>
     probe.style.fontSize = "var(--font-size-prompt-touch)";
   });
 
+const chatFontSize = () =>
+  renderedFontSize((probe) => {
+    // The chat markdown root's size class.
+    probe.className = "text-(length:--font-size-chat,var(--text-sm))";
+  });
+
 describe("applyAppearanceFontVariables", () => {
   it("sizes the composer from the interface size until fonts are set separately", () => {
     const root = document.documentElement;
@@ -35,6 +41,7 @@ describe("applyAppearanceFontVariables", () => {
       composer: "",
       sizeInterface: 20,
       sizePrompt: 14,
+      sizeChat: null,
       sizeCode: 13,
       smoothing: true,
     };
@@ -47,6 +54,11 @@ describe("applyAppearanceFontVariables", () => {
       expect(composerFontSize()).toBe("14px");
       // iOS zooms into inputs under 16px.
       expect(touchComposerFontSize()).toBe("16px");
+
+      applyAppearanceFontVariables(root, { ...preferences, separate: false });
+      expect(chatFontSize()).toBe("17.5px");
+      applyAppearanceFontVariables(root, { ...preferences, sizeChat: 18, separate: false });
+      expect(chatFontSize()).toBe("18px");
     } finally {
       if (style === null) root.removeAttribute("style");
       else root.setAttribute("style", style);
